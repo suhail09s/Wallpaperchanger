@@ -3,40 +3,37 @@ import os
 import threading
 import random
 import time
-import win32file
+import glob
 global wall
-wall=[]
+walllist=[]
 global path
-global list
-path='c:\\' # the path has to end with  (\\)
-t=5           # the duration in seconds
-def listing(list,v):
-    for a in range (len(list)):
-        if str(list[a]).split('.')[-1]=='jpg' or str(list[a]).split('.')[-1]=='png' or str(list[a]).split('.')[-1]=='gif':
-            wall.append(v+'\\'+list[a])
+def readdir(path):
+            counter=0 
+            for filename in glob.iglob(path + '**/*.***', recursive=True):
+             counter+=1
+             if str(filename).split('.')[-1]=='jpg' or str(filename).split('.')[-1]=='png' or str(filename).split('.')[-1]=='gif':
+                walllist.append(filename)
+                
+             if counter %1000 ==0: # msg when the script takes too long and looks frozen
+                 print('still reading, reached:',filename)
+            return walllist
+path='e:\Wallpapers\\' # the path has to end with  (\\)
+t=10          # the duration in seconds
 start=time.time()
-list=os.listdir(path)
+wall=readdir(path)
+print ('Looping through:',len(wall),'wallpapers')
 
-listing(list,"")
-for v in list:
-    try:    
-        dirlist=os.listdir(path+v)
-        listing(dirlist,v)
-        print('found a folder',v)
-    except:
-        pass
-
-print (len(wall),'Wallpapers were found')
 ran=random.randint(0,len(wall))
-path=path+'{}'
+
 print (time.time()-start)
 if len(wall)==0:
-    print('No wallpapers were found, please check.')
+    print('No wallpapers were found, please check path.')
     exit(0)
 
 while True:
     time.sleep(t)
     ran=random.randint(0,len(wall))-1
     
-    ctypes.windll.user32.SystemParametersInfoW(20, 0, str(path).format(wall[ran]) , 0)
+    ctypes.windll.user32.SystemParametersInfoW(20, 0,str(wall[ran]) , 0)
+    print (wall[ran])
     
